@@ -1,0 +1,48 @@
+﻿<Window x:Class="MyGrampsApp.AddPersonWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyGrampsApp"
+        mc:Ignorable="d"
+        Title="Додати нову особу" Height="550" Width="450">
+    <StackPanel Margin="20">
+        <TextBlock Text="Прізвище:"/>
+        <TextBox x:Name="txtLastName" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Ім'я:"/>
+        <TextBox x:Name="txtFirstName" Margin="0,0,0,10"/>
+
+        <TextBlock Text="По батькові:"/>
+        <TextBox x:Name="txtPatronymic" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Дівоче прізвище:"/>
+        <TextBox x:Name="txtMaidenName" Margin="0,0,0,10"/>
+
+        <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                <TextBlock Text="Стать:"/>
+                <ComboBox x:Name="cbSex">
+                    <ComboBoxItem Content="M"/>
+                    <ComboBoxItem Content="F"/>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                <TextBlock Text="Дата народження:"/>
+                <DatePicker x:Name="dpBirthDate"/>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Text="Місце народження:"/>
+        <ComboBox x:Name="cbBirthPlace" DisplayMemberPath="name" SelectedValuePath="id" Margin="0,0,0,10"/>
+
+        <TextBlock Text="Нотатки:"/>
+        <TextBox x:Name="txtNotes" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,15"/>
+
+        <Button Content="Зберегти особу" Height="40" Click="btnSave_Click" Background="LightGreen"/>
+    </StackPanel>
+</Window>
