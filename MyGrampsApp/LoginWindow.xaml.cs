@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,16 +11,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Microsoft.Data.SqlClient;
 namespace MyGrampsApp
 {
-
-    /// <summary>
-    /// Interaction logic for LoginWindow.xaml
-    /// </summary>
     public partial class LoginWindow : Window
     {
-        // Рядок підключення (той самий, що ми перевіряли)
         string connString = "Server=localhost;Database=new_database;User Id=sa;Password=2026777;TrustServerCertificate=True;";
 
         public LoginWindow()
@@ -26,28 +22,43 @@ namespace MyGrampsApp
             InitializeComponent();
         }
 
-        // Кнопка Входу
+        // МЕТОД ДЛЯ ХЕШУВАННЯ 
+        private string ComputeHash(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in bytes) builder.Append(b.ToString("x2"));
+                return builder.ToString();
+            }
+        }
+
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtUsername.Text) || string.IsNullOrWhiteSpace(txtPassword.Password))
+            {
+                MessageBox.Show("Введіть логін та пароль!");
+                return;
+            }
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 try
                 {
                     conn.Open();
-                    // Перевіряємо, чи є користувач з таким логіном і паролем
                     string query = "SELECT id FROM app_users WHERE username=@user AND password_hash=@pass";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@user", txtUsername.Text);
-                    cmd.Parameters.AddWithValue("@pass", txtPassword.Password);
+                    // Порівнюємо з ХЕШЕМ введеного пароля
+                    cmd.Parameters.AddWithValue("@pass", ComputeHash(txtPassword.Password));
 
                     object userId = cmd.ExecuteScalar();
 
                     if (userId != null)
                     {
-                        // Якщо знайшли — зберігаємо ID та відкриваємо головне вікно
                         App.CurrentUserId = Convert.ToInt32(userId);
-                        MainWindow main = new MainWindow();
-                        main.Show();
+                        new MainWindow().Show();
                         this.Close();
                     }
                     else
@@ -59,9 +70,15 @@ namespace MyGrampsApp
             }
         }
 
-        // Кнопка Реєстрації
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
+            // ВАЛІДАЦІЯ: не дозволяємо порожні або короткі дані
+            if (txtUsername.Text.Length < 3 || txtPassword.Password.Length < 6)
+            {
+                MessageBox.Show("Логін має бути від 3 символів, пароль — від 6!");
+                return;
+            }
+
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 try
@@ -70,13 +87,23 @@ namespace MyGrampsApp
                     string query = "INSERT INTO app_users (username, password_hash) VALUES (@user, @pass)";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@user", txtUsername.Text);
-                    cmd.Parameters.AddWithValue("@pass", txtPassword.Password);
+                    // ЗБЕРІГАЄМО ХЕШ ПАРОЛЯ
+                    cmd.Parameters.AddWithValue("@pass", ComputeHash(txtPassword.Password));
 
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Реєстрація успішна! Тепер можете увійти.");
                 }
-                catch (Exception) { MessageBox.Show("Такий логін вже зайнятий!"); }
+                catch (SqlException)
+                {
+                    MessageBox.Show("Такий логін вже зайнятий або помилка БД!");
+                }
+                catch (Exception ex) { MessageBox.Show("Помилка: " + ex.Message); }
             }
+        }
+
+        private void txtUsername_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }
