@@ -21,6 +21,7 @@ namespace MyGrampsApp
         public MainWindow()
         {
             InitializeComponent();
+            LoadPeopleData();
         }
 
         // --- СЕКЦІЯ 1: ВВЕДЕННЯ ІНФОРМАЦІЇ ---
@@ -103,5 +104,32 @@ namespace MyGrampsApp
 
         // ВИПРАВЛЕНО: прибираємо 'this.' перед Application
         private void btnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
+
+        private void LoadPeopleData()
+        {
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                try
+                {
+                    conn.Open();
+                    // Вибираємо тільки тих людей, які належать поточному користувачу
+                    string sql = "SELECT first_name AS [Ім'я], last_name AS [Прізвище], sex AS [Стать], birth_date AS [Дата нар.] FROM person WHERE user_id = @uid";
+
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
+
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    // Прив'язуємо дані до таблиці dgPeople, яку ми створили в XAML
+                    dgPeople.ItemsSource = dt.DefaultView;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Помилка завантаження даних: " + ex.Message);
+                }
+            }
+        }
     }
 }
