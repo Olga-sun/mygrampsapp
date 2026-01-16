@@ -112,8 +112,21 @@ namespace MyGrampsApp
                 try
                 {
                     conn.Open();
-                    // Вибираємо тільки тих людей, які належать поточному користувачу
-                    string sql = "SELECT first_name AS [Ім'я], last_name AS [Прізвище], sex AS [Стать], birth_date AS [Дата нар.] FROM person WHERE user_id = @uid";
+
+                    // Використовуємо прості імена стовпців для стабільності
+                    string sql = @"
+                SELECT 
+                    p.first_name AS [Ім'я], 
+                    p.last_name AS [Прізвище], 
+                    p.sex AS [Стать], 
+                    CONVERT(VARCHAR, p.birth_date, 104) AS [Дата нар], 
+                    CONVERT(VARCHAR, p.death_date, 104) AS [Дата см],
+                    (SELECT TOP 1 occupation 
+                     FROM person_occupation 
+                     WHERE person_id = p.id AND user_id = @uid 
+                     ORDER BY from_dt DESC) AS [Професія]
+                FROM person p
+                WHERE p.user_id = @uid";
 
                     SqlCommand cmd = new SqlCommand(sql, conn);
                     cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
@@ -122,12 +135,11 @@ namespace MyGrampsApp
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
 
-                    // Прив'язуємо дані до таблиці dgPeople, яку ми створили в XAML
                     dgPeople.ItemsSource = dt.DefaultView;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Помилка завантаження даних: " + ex.Message);
+                    MessageBox.Show("Помилка завантаження: " + ex.Message);
                 }
             }
         }
