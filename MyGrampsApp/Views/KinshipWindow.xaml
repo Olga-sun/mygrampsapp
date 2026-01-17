@@ -1,0 +1,72 @@
+﻿<Window x:Class="MyGrampsApp.Views.KinshipWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Встановлення родинних зв'язків" Height="450" Width="450">
+
+    <StackPanel Margin="20">
+        <TextBlock Text="Хто (Батько/Родич):" FontWeight="SemiBold"/>
+        <ComboBox ItemsSource="{Binding People}" 
+                  SelectedItem="{Binding SelectedParent}" 
+                  Margin="0,5,0,15"
+                  Height="30"
+                  VerticalContentAlignment="Center">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding LastName}" Margin="0,0,5,0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding FirstName}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="Кому (Дитина):" FontWeight="SemiBold"/>
+        <ComboBox ItemsSource="{Binding People}" 
+                  SelectedItem="{Binding SelectedChild}" 
+                  Margin="0,5,0,15"
+                  Height="30"
+                  VerticalContentAlignment="Center">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding LastName}" Margin="0,0,5,0" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding FirstName}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="Тип зв'язку:" FontWeight="SemiBold"/>
+        <ComboBox SelectedValue="{Binding SelectedRelationType}" 
+                  SelectedValuePath="Content"
+                  Margin="0,5,0,20"
+                  Height="30"
+                  VerticalContentAlignment="Center">
+            <ComboBoxItem Content="parent-child"/>
+            <ComboBoxItem Content="relative"/>
+            <ComboBoxItem Content="godparent"/>
+        </ComboBox>
+
+        <Button Content="Зберегти зв'язок" 
+                Command="{Binding SaveKinshipCommand}" 
+                Height="45" 
+                Background="LightGreen"
+                FontWeight="Bold"
+                Cursor="Hand">
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+
+        <TextBlock Text="* Обидві особи повинні бути заздалегідь зареєстровані в системі" 
+                   FontSize="10" 
+                   Foreground="Gray" 
+                   Margin="0,15,0,0" 
+                   TextAlignment="Center"/>
+    </StackPanel>
+</Window>

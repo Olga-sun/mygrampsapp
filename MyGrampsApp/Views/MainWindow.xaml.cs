@@ -22,7 +22,7 @@ namespace MyGrampsApp
         {
             InitializeComponent();
             _viewModel = new MyGrampsApp.ViewModels.MainViewModel();
-            this.DataContext = new MyGrampsApp.ViewModels.MainViewModel();
+            this.DataContext = _viewModel;
         }
 
         // --- СЕКЦІЯ 1: ВВЕДЕННЯ ІНФОРМАЦІЇ ---
@@ -41,13 +41,7 @@ namespace MyGrampsApp
             addDocWin.ShowDialog();
         }
 
-        private void btnAddKinship_Click(object sender, RoutedEventArgs e)
-        {
-            // Тут ми створимо вікно для зв'язків пізніше
-            MessageBox.Show("Вікно встановлення зв'язків у розробці.");
-        }
-
-        // --- СЕКЦІЯ 2: ПОШУК ТА ФІЛЬТРАЦІЯ ---
+               // --- СЕКЦІЯ 2: ПОШУК ТА ФІЛЬТРАЦІЯ ---
 
         private void btnSearch_Click(object sender, RoutedEventArgs e)
         {
@@ -103,7 +97,6 @@ namespace MyGrampsApp
             this.WindowState = (this.WindowState == WindowState.Maximized) ? WindowState.Normal : WindowState.Maximized;
         }
 
-        // ВИПРАВЛЕНО: прибираємо 'this.' перед Application
         private void btnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
 

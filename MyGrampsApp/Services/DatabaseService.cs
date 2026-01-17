@@ -45,5 +45,33 @@ namespace MyGrampsApp.Services
             }
             return people;
         }
+
+        public bool AddKinship(int parentId, int childId, string relationType)
+        {
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = @"INSERT INTO kinship (parent_id, child_id, relation_type, user_id) 
+                                   VALUES (@pid, @cid, @type, @uid)";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@pid", parentId);
+                        cmd.Parameters.AddWithValue("@cid", childId);
+                        cmd.Parameters.AddWithValue("@type", relationType);
+                        cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
+
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show("Помилка БД: " + ex.Message);
+                    return false;
+                }
+            }
+        }
     }
 }

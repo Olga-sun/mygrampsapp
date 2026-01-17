@@ -47,7 +47,7 @@
             <MenuItem Header="➕ Введення інформації" Background="#E3F2FD">
                 <MenuItem Header="Реєстрація особи" Click="btnAddPerson_Click"/>
                 <MenuItem Header="Додавання документів" Click="btnAddDocument_Click"/>
-                <MenuItem Header="Встановлення зв'язків" Click="btnAddKinship_Click"/>
+                <MenuItem Header="Встановлення зв'язків" Command="{Binding OpenKinshipCommand}"/>
             </MenuItem>
 
             <MenuItem Header="🔍 Пошук та фільтрація" Background="#F1F8E9">

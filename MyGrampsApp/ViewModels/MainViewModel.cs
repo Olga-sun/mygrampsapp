@@ -1,28 +1,28 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Input; // Додаємо для ICommand
-using MyGrampsApp.Models;
+﻿using MyGrampsApp.Models;
 using MyGrampsApp.Services;
+using MyGrampsApp.Views;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input; // Додаємо для ICommand
 
 namespace MyGrampsApp.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         private readonly DatabaseService _dbService = new DatabaseService();
-
-        // Колекція, до якої прив'язаний DataGrid
         public ObservableCollection<Person> People { get; set; } = new ObservableCollection<Person>();
 
-        // Команда для кнопки "Оновити"
         public ICommand RefreshCommand { get; }
+        // 1. Додаємо команду для відкриття вікна
+        public ICommand OpenKinshipCommand { get; }
 
         public MainViewModel()
         {
-            // Ініціалізуємо команду
             RefreshCommand = new RelayCommand(obj => LoadPeopleData());
+            // 2. Ініціалізуємо команду відкриття
+            OpenKinshipCommand = new RelayCommand(obj => OpenKinshipWindow());
 
-            // Завантажуємо дані при створенні ViewModel
             LoadPeopleData();
         }
 
@@ -30,19 +30,22 @@ namespace MyGrampsApp.ViewModels
         {
             try
             {
-                // Обов'язково очищуємо існуючу колекцію, а не створюємо нову
                 People.Clear();
                 var data = _dbService.GetAllPeople(App.CurrentUserId);
-
-                foreach (var person in data)
-                {
-                    People.Add(person);
-                }
+                foreach (var person in data) People.Add(person);
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show("Помилка завантаження через сервіс: " + ex.Message);
+                MessageBox.Show("Помилка завантаження: " + ex.Message);
             }
+        }
+
+        private void OpenKinshipWindow()
+        {
+            var win = new KinshipWindow();
+            win.DataContext = new KinshipViewModel(this.People);
+            win.ShowDialog();
+            LoadPeopleData();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -70,4 +73,59 @@ namespace MyGrampsApp.ViewModels
             remove => CommandManager.RequerySuggested -= value;
         }
     }
+
+    // --- VIEWMODEL ДЛЯ ВІКНА ЗВ'ЯЗКІВ ---
+    public class KinshipViewModel : INotifyPropertyChanged
+    {
+        private readonly DatabaseService _dbService = new DatabaseService();
+        public ObservableCollection<Person> People { get; set; }
+
+        // 3. Повноцінні властивості з повідомленням про зміни для ComboBox
+        private Person _selectedParent;
+        public Person SelectedParent
+        {
+            get => _selectedParent;
+            set { _selectedParent = value; OnPropertyChanged(nameof(SelectedParent)); }
+        }
+
+        private Person _selectedChild;
+        public Person SelectedChild
+        {
+            get => _selectedChild;
+            set { _selectedChild = value; OnPropertyChanged(nameof(SelectedChild)); }
+        }
+
+        public string SelectedRelationType { get; set; } = "parent-child";
+        public ICommand SaveKinshipCommand { get; }
+
+        public KinshipViewModel(IEnumerable<Person> currentPeople)
+        {
+            People = new ObservableCollection<Person>(currentPeople);
+
+            SaveKinshipCommand = new RelayCommand(obj =>
+            {
+                if (SelectedParent == null || SelectedChild == null)
+                {
+                    MessageBox.Show("Виберіть обох осіб!");
+                    return;
+                }
+
+                if (SelectedParent.Id == SelectedChild.Id)
+                {
+                    MessageBox.Show("Особа не може бути родичем самій собі!");
+                    return;
+                }
+
+                if (_dbService.AddKinship(SelectedParent.Id, SelectedChild.Id, SelectedRelationType))
+                {
+                    MessageBox.Show("Зв'язок успішно додано до бази!");
+                }
+            });
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
 }

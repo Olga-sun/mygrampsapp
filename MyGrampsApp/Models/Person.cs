@@ -15,7 +15,8 @@ namespace MyGrampsApp.Models
         public string? DeathDate { get; set; } 
         public string? Notes { get; set; } 
 
-        // Для фільтрації по користувачу
-        public int UserId { get; set; } 
+        public int UserId { get; set; }
+        public string FullName => $"{LastName} {FirstName} {Patronymic}".Trim();
+        public override string ToString() => FullName;
     }
 }
