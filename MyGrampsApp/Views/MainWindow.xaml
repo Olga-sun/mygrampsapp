@@ -43,7 +43,7 @@
                     </Style.Resources>
                 </Style>
             </Menu.Resources>
-
+            
             <MenuItem Header="➕ Введення інформації" Background="#E3F2FD">
                 <MenuItem Header="Реєстрація особи" Click="btnAddPerson_Click"/>
                 <MenuItem Header="Додавання документів" Click="btnAddDocument_Click"/>
@@ -71,10 +71,20 @@
 
         <Grid Margin="10">
             <DataGrid x:Name="dgPeople" 
-                      AutoGenerateColumns="True" 
-                      IsReadOnly="True" 
-                      Background="White"
-                      AlternatingRowBackground="#F2F2F2"/>
+          ItemsSource="{Binding People}" 
+          AutoGenerateColumns="False" 
+          IsReadOnly="True" 
+          Background="White"
+          AlternatingRowBackground="#F2F2F2"
+          Margin="10">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ім'я" Binding="{Binding FirstName}" Width="*"/>
+                    <DataGridTextColumn Header="Прізвище" Binding="{Binding LastName}" Width="*"/>
+                    <DataGridTextColumn Header="Стать" Binding="{Binding Sex}" Width="80"/>
+                    <DataGridTextColumn Header="Дата народження" Binding="{Binding BirthDate}" Width="120"/>
+                    <DataGridTextColumn Header="Дата смерті" Binding="{Binding DeathDate}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </DockPanel>
 </Window>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using MyGrampsApp.ViewModels;
 using System.Data;
 using System.Diagnostics;
 using System.IO;         
@@ -16,12 +17,16 @@ namespace MyGrampsApp
 {
     public partial class MainWindow : Window
     {
-        string connString = "Server=localhost;Database=new_database;User Id=sa;Password=2026777;TrustServerCertificate=True;";
-
+        private MainViewModel _viewModel = new MainViewModel();
         public MainWindow()
         {
             InitializeComponent();
-            LoadPeopleData();
+
+            var viewModel = new MyGrampsApp.ViewModels.MainViewModel();
+
+            this.DataContext = viewModel;
+
+            viewModel.LoadPeopleData();
         }
 
         // --- СЕКЦІЯ 1: ВВЕДЕННЯ ІНФОРМАЦІЇ ---
@@ -105,47 +110,10 @@ namespace MyGrampsApp
         // ВИПРАВЛЕНО: прибираємо 'this.' перед Application
         private void btnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
-        private void LoadPeopleData()
-        {
-            using (SqlConnection conn = new SqlConnection(connString))
-            {
-                try
-                {
-                    conn.Open();
-
-                    // Використовуємо прості імена стовпців для стабільності
-                    string sql = @"
-                SELECT 
-                    p.first_name AS [Ім'я], 
-                    p.last_name AS [Прізвище], 
-                    p.sex AS [Стать], 
-                    CONVERT(VARCHAR, p.birth_date, 104) AS [Дата нар], 
-                    CONVERT(VARCHAR, p.death_date, 104) AS [Дата см],
-                    (SELECT TOP 1 occupation 
-                     FROM person_occupation 
-                     WHERE person_id = p.id AND user_id = @uid 
-                     ORDER BY from_dt DESC) AS [Професія]
-                FROM person p
-                WHERE p.user_id = @uid";
-
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
-
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-
-                    dgPeople.ItemsSource = dt.DefaultView;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Помилка завантаження: " + ex.Message);
-                }
-            }
-        }
+        
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            LoadPeopleData(); 
+            _viewModel.LoadPeopleData();
         }
     }
 }
