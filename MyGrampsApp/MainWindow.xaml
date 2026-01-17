@@ -29,6 +29,19 @@
                     <Setter Property="FontSize" Value="14"/>
                     <Setter Property="BorderThickness" Value="0"/>
                 </Style>
+                <Style x:Key="RefreshButtonStyle" TargetType="Button">
+                    <Setter Property="Background" Value="#ECEFF1"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Padding" Value="15,5"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                    <Setter Property="Margin" Value="5,0"/>
+                    <Style.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                    </Style.Resources>
+                </Style>
             </Menu.Resources>
 
             <MenuItem Header="➕ Введення інформації" Background="#E3F2FD">
@@ -48,6 +61,12 @@
                 <MenuItem Header="Статистика життя" Click="btnStats_Click"/>
                 <MenuItem Header="Біографічна картка" Click="btnBio_Click"/>
             </MenuItem>
+            
+            <Button x:Name="btnRefresh" 
+        Content="🔄 Оновити" 
+        Click="btnRefresh_Click" 
+        Style="{StaticResource RefreshButtonStyle}"
+        VerticalAlignment="Center"/>
         </Menu>
 
         <Grid Margin="10">

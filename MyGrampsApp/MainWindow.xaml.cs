@@ -143,5 +143,9 @@ namespace MyGrampsApp
                 }
             }
         }
+        private void btnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            LoadPeopleData(); 
+        }
     }
 }
