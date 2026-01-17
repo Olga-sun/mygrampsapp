@@ -43,8 +43,8 @@ namespace MyGrampsApp
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string sql = @"INSERT INTO person (first_name, last_name, patronymic, maiden_name, sex, birth_date, birth_place_id, notes, user_id) 
-                       VALUES (@fn, @ln, @patr, @mn, @sex, @bd, @bpid, @notes, @uid)";
+                string sql = @"INSERT INTO person (first_name, last_name, patronymic, maiden_name, sex, birth_date, birth_place_id, notes, death_date, user_id) 
+                       VALUES (@fn, @ln, @patr, @mn, @sex, @bd, @bpid, @notes, @dd, @uid)";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
 
@@ -64,6 +64,8 @@ namespace MyGrampsApp
                 cmd.Parameters.AddWithValue("@notes", string.IsNullOrWhiteSpace(txtNotes.Text) ? DBNull.Value : txtNotes.Text);
 
                 cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
+
+                cmd.Parameters.AddWithValue("@dd", (object)dpDeathDate.SelectedDate ?? DBNull.Value);
 
                 try
                 {
