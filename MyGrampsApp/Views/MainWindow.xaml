@@ -64,7 +64,7 @@
             
             <Button x:Name="btnRefresh" 
         Content="🔄 Оновити" 
-        Click="btnRefresh_Click" 
+        Command="{Binding RefreshCommand}"
         Style="{StaticResource RefreshButtonStyle}"
         VerticalAlignment="Center"/>
         </Menu>

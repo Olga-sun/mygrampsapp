@@ -17,16 +17,12 @@ namespace MyGrampsApp
 {
     public partial class MainWindow : Window
     {
-        private MainViewModel _viewModel = new MainViewModel();
+        private MainViewModel _viewModel;
         public MainWindow()
         {
             InitializeComponent();
-
-            var viewModel = new MyGrampsApp.ViewModels.MainViewModel();
-
-            this.DataContext = viewModel;
-
-            viewModel.LoadPeopleData();
+            _viewModel = new MyGrampsApp.ViewModels.MainViewModel();
+            this.DataContext = new MyGrampsApp.ViewModels.MainViewModel();
         }
 
         // --- СЕКЦІЯ 1: ВВЕДЕННЯ ІНФОРМАЦІЇ ---
@@ -110,10 +106,7 @@ namespace MyGrampsApp
         // ВИПРАВЛЕНО: прибираємо 'this.' перед Application
         private void btnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
-        
-        private void btnRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.LoadPeopleData();
-        }
+
+      
     }
 }

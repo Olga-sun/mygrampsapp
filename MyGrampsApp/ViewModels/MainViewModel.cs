@@ -1,61 +1,73 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Microsoft.Data.SqlClient;
+using System.Windows.Input; // Додаємо для ICommand
 using MyGrampsApp.Models;
+using MyGrampsApp.Services;
 using System.Windows;
 
 namespace MyGrampsApp.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private string connString = "Server=localhost;Database=new_database;User Id=sa;Password=2026777;TrustServerCertificate=True;";
+        private readonly DatabaseService _dbService = new DatabaseService();
 
-        // Список людей, який побачить DataGrid
+        // Колекція, до якої прив'язаний DataGrid
         public ObservableCollection<Person> People { get; set; } = new ObservableCollection<Person>();
+
+        // Команда для кнопки "Оновити"
+        public ICommand RefreshCommand { get; }
+
+        public MainViewModel()
+        {
+            // Ініціалізуємо команду
+            RefreshCommand = new RelayCommand(obj => LoadPeopleData());
+
+            // Завантажуємо дані при створенні ViewModel
+            LoadPeopleData();
+        }
 
         public void LoadPeopleData()
         {
-            People.Clear();
-            using (SqlConnection conn = new SqlConnection(connString))
+            try
             {
-                try
-                {
-                    conn.Open();
-                    string sql = @"
-                        SELECT p.id, p.first_name, p.last_name, p.sex, 
-                               CONVERT(VARCHAR, p.birth_date, 104) AS birth_date, 
-                               CONVERT(VARCHAR, p.death_date, 104) AS death_date
-                        FROM person p
-                        WHERE p.user_id = @uid";
+                // Обов'язково очищуємо існуючу колекцію, а не створюємо нову
+                People.Clear();
+                var data = _dbService.GetAllPeople(App.CurrentUserId);
 
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            People.Add(new Person
-                            {
-                                Id = (int)reader["id"],
-                                FirstName = reader["first_name"].ToString(),
-                                LastName = reader["last_name"].ToString(),
-                                Sex = reader["sex"].ToString(),
-                                BirthDate = reader["birth_date"].ToString(),
-                                DeathDate = reader["death_date"].ToString()
-                            });
-                        }
-                    }
-                }
-                catch (Exception ex)
+                foreach (var person in data)
                 {
-                    MessageBox.Show("Помилка завантаження: " + ex.Message);
+                    People.Add(person);
                 }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show("Помилка завантаження через сервіс: " + ex.Message);
             }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+    // Проста реалізація RelayCommand всередині того ж файлу (або винесіть у папку Services/Commands)
+    public class RelayCommand : ICommand
+    {
+        private readonly System.Action<object> _execute;
+        private readonly System.Predicate<object> _canExecute;
+
+        public RelayCommand(System.Action<object> execute, System.Predicate<object> canExecute = null)
+        {
+            _execute = execute ?? throw new System.ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+        public void Execute(object parameter) => _execute(parameter);
+        public event System.EventHandler CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
     }
 }
