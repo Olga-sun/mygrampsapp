@@ -137,5 +137,17 @@ namespace MyGrampsApp.Services
                 }
             }
         }
+        public DataTable GetFamilyLinks(int userId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                string sql = "SELECT parent_id, child_id FROM kinship WHERE user_id = @uid";
+                SqlDataAdapter adapter = new SqlDataAdapter(sql, conn);
+                adapter.SelectCommand.Parameters.AddWithValue("@uid", userId);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                return dt;
+            }
+        }
     }
 }

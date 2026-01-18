@@ -34,7 +34,7 @@ namespace MyGrampsApp.ViewModels
             RefreshCommand = new RelayCommand(obj => LoadPeopleData());
             OpenKinshipCommand = new RelayCommand(obj => OpenKinshipWindow());
             OpenAddPersonCommand = new RelayCommand(obj => OpenAddPersonWindow());
-
+            OpenBuildTreeCommand = new RelayCommand(obj => OpenBuildTree());
             // Ініціалізація нових команд та заглушок
             OpenAddDocumentCommand = new RelayCommand(obj => OpenAddDocumentWindow());
 
@@ -42,7 +42,7 @@ namespace MyGrampsApp.ViewModels
             OpenSearchCommand = new RelayCommand(obj => MessageBox.Show("Вікно пошуку розробляється"));
             OpenFilterPlaceCommand = new RelayCommand(obj => MessageBox.Show("Фільтрація розробляється"));
             OpenShowDocsCommand = new RelayCommand(obj => MessageBox.Show("Список документів розробляється"));
-            OpenBuildTreeCommand = new RelayCommand(obj => MessageBox.Show("Побудова дерева розробляється"));
+            
             OpenStatsCommand = new RelayCommand(obj => MessageBox.Show("Статистика розробляється"));
             OpenBioCommand = new RelayCommand(obj => MessageBox.Show("Біографія розробляється"));
 
@@ -50,6 +50,13 @@ namespace MyGrampsApp.ViewModels
         }
 
         // Методи відкриття вікон
+
+        private void OpenBuildTree()
+        {
+            FamilyTreeWindow treeWin = new FamilyTreeWindow();
+            treeWin.Owner = Application.Current.MainWindow; // Щоб вікно було по центру головного
+            treeWin.ShowDialog();
+        }
         private void OpenAddPersonWindow()
         {
             var win = new AddPersonWindow();
