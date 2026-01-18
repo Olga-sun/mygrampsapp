@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using MyGrampsApp.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.Windows;
 
 namespace MyGrampsApp.Services
@@ -79,6 +80,60 @@ namespace MyGrampsApp.Services
                 {
                     MessageBox.Show("Помилка додавання: " + ex.Message);
                     return false;
+                }
+            }
+        }
+        public bool AddPerson(Person person)
+        {
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                try
+                {
+                    conn.Open();
+                    // Запит включає всі 10 колонок з вашої структури (крім id)
+                    string sql = @"INSERT INTO person (sex, birth_date, death_date, birth_place_id, notes, last_name, first_name, patronymic, maiden_name, user_id) 
+                           VALUES (@sex, @bd, @dd, @bpid, @notes, @ln, @fn, @pat, @mn, @uid)";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sex", person.Sex);
+                        cmd.Parameters.AddWithValue("@bd", person.BirthDate);
+                        cmd.Parameters.AddWithValue("@dd", (object)person.DeathDate ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@bpid", (object)person.BirthPlaceId ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@notes", (object)person.Notes ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@ln", person.LastName);
+                        cmd.Parameters.AddWithValue("@fn", person.FirstName);
+                        cmd.Parameters.AddWithValue("@pat", person.Patronymic);
+                        cmd.Parameters.AddWithValue("@mn", (object)person.MaidenName ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
+
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Помилка додавання особи: " + ex.Message);
+                    return false;
+                }
+            }
+        }
+        public DataTable GetPlaces()
+        {
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "SELECT id, name FROM place";
+                    SqlDataAdapter adapter = new SqlDataAdapter(sql, conn);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    return dt;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Помилка завантаження місць: " + ex.Message);
+                    return new DataTable(); // Повертаємо порожню таблицю, щоб уникнути NullReference
                 }
             }
         }

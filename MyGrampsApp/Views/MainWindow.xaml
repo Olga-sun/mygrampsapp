@@ -45,21 +45,21 @@
             </Menu.Resources>
             
             <MenuItem Header="➕ Введення інформації" Background="#E3F2FD">
-                <MenuItem Header="Реєстрація особи" Click="btnAddPerson_Click"/>
-                <MenuItem Header="Додавання документів" Click="btnAddDocument_Click"/>
+                <MenuItem Header="Реєстрація особи" Command="{Binding OpenAddPersonCommand}"/>
+                <MenuItem Header="Додавання документів" Command="{Binding OpenAddDocumentCommand}"/>
                 <MenuItem Header="Встановлення зв'язків" Command="{Binding OpenKinshipCommand}"/>
             </MenuItem>
 
             <MenuItem Header="🔍 Пошук та фільтрація" Background="#F1F8E9">
-                <MenuItem Header="Пошук за ПІБ" Click="btnSearch_Click"/>
-                <MenuItem Header="Фільтр за місцем" Click="btnFilterPlace_Click"/>
-                <MenuItem Header="Переглянути документи" Click="btnShowDocs_Click" Background="#FFF9C4"/>
+                <MenuItem Header="Пошук за ПІБ" Command="{Binding OpenSearchCommand}"/>
+                <MenuItem Header="Фільтр за місцем" Command="{Binding OpenFilterPlaceCommand}"/>
+                <MenuItem Header="Переглянути документи" Command="{Binding OpenShowDocsCommand}" Background="#FFF9C4"/>
             </MenuItem>
 
             <MenuItem Header="📄 Генерація звітів" Background="#FFF3E0">
-                <MenuItem Header="Побудова дерева" Click="btnBuildTree_Click"/>
-                <MenuItem Header="Статистика життя" Click="btnStats_Click"/>
-                <MenuItem Header="Біографічна картка" Click="btnBio_Click"/>
+                <MenuItem Header="Побудова дерева" Command="{Binding OpenBuildTreeCommand}"/>
+                <MenuItem Header="Статистика життя" Command="{Binding OpenStatsCommand}"/>
+                <MenuItem Header="Біографічна картка" Command="{Binding OpenBioCommand}"/>
             </MenuItem>
             
             <Button x:Name="btnRefresh" 
