@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using MyGrampsApp.Models;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace MyGrampsApp.Services
 {
@@ -54,7 +55,7 @@ namespace MyGrampsApp.Services
                 {
                     conn.Open();
                     string sql = @"INSERT INTO kinship (parent_id, child_id, relation_type, user_id) 
-                                   VALUES (@pid, @cid, @type, @uid)";
+                           VALUES (@pid, @cid, @type, @uid)";
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -63,12 +64,20 @@ namespace MyGrampsApp.Services
                         cmd.Parameters.AddWithValue("@type", relationType);
                         cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
 
-                        return cmd.ExecuteNonQuery() > 0;
+                        // Виконуємо запит. Якщо тригер викине RAISERROR, ми перейдемо в блок catch.
+                        cmd.ExecuteNonQuery();
+                        return true;
                     }
+                }
+                catch (SqlException ex)
+                {
+                    // Виводимо повідомлення про дублікат або іншу помилку БД
+                    MessageBox.Show(ex.Message);
+                    return false;
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.MessageBox.Show("Помилка БД: " + ex.Message);
+                    MessageBox.Show("Помилка додавання: " + ex.Message);
                     return false;
                 }
             }

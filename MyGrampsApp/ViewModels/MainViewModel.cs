@@ -80,7 +80,6 @@ namespace MyGrampsApp.ViewModels
         private readonly DatabaseService _dbService = new DatabaseService();
         public ObservableCollection<Person> People { get; set; }
 
-        // 3. Повноцінні властивості з повідомленням про зміни для ComboBox
         private Person _selectedParent;
         public Person SelectedParent
         {
@@ -104,6 +103,7 @@ namespace MyGrampsApp.ViewModels
 
             SaveKinshipCommand = new RelayCommand(obj =>
             {
+                // Перевірки перед відправкою
                 if (SelectedParent == null || SelectedChild == null)
                 {
                     MessageBox.Show("Виберіть обох осіб!");
@@ -116,13 +116,15 @@ namespace MyGrampsApp.ViewModels
                     return;
                 }
 
+                // Один виклик сервісу. 
+                // Результат true означає успіх. 
+                // Результат false означає, що DatabaseService вже показав текст помилки з БД.
                 if (_dbService.AddKinship(SelectedParent.Id, SelectedChild.Id, SelectedRelationType))
                 {
                     MessageBox.Show("Зв'язок успішно додано до бази!");
                 }
             });
         }
-
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
