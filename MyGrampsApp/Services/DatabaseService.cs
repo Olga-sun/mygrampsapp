@@ -149,5 +149,26 @@ namespace MyGrampsApp.Services
                 return dt;
             }
         }
+        public bool DeletePerson(int personId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                conn.Open();
+                // Важливо: видаляємо тільки якщо id особи та id користувача збігаються
+                string sql = "DELETE FROM person WHERE id = @pid AND user_id = @uid";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@pid", personId);
+                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId); // ID поточної сесії
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
     }
 }
+
+
+
+

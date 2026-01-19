@@ -12,21 +12,28 @@ namespace MyGrampsApp.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         private readonly DatabaseService _dbService = new DatabaseService();
+
         public ObservableCollection<Person> People { get; set; } = new ObservableCollection<Person>();
 
+        private Person _selectedPerson;
+        public Person SelectedPerson
+        {
+            get => _selectedPerson;
+            set { _selectedPerson = value; OnPropertyChanged(nameof(SelectedPerson)); }
+        }
         // Команди для вікон введення
         public ICommand RefreshCommand { get; }
         public ICommand OpenKinshipCommand { get; }
         public ICommand OpenAddPersonCommand { get; }
         public ICommand OpenAddDocumentCommand { get; }
 
-        // Команди-заглушки для пошуку та звітів
         public ICommand OpenSearchCommand { get; }
         public ICommand OpenFilterPlaceCommand { get; }
         public ICommand OpenShowDocsCommand { get; }
         public ICommand OpenBuildTreeCommand { get; }
         public ICommand OpenStatsCommand { get; }
         public ICommand OpenBioCommand { get; }
+        public ICommand DeletePersonCommand { get; }
 
         public MainViewModel()
         {
@@ -37,7 +44,10 @@ namespace MyGrampsApp.ViewModels
             OpenBuildTreeCommand = new RelayCommand(obj => OpenBuildTree());
             // Ініціалізація нових команд та заглушок
             OpenAddDocumentCommand = new RelayCommand(obj => OpenAddDocumentWindow());
-
+            DeletePersonCommand = new RelayCommand(
+                execute: obj => ExecuteDeletePerson(obj as Person),
+                canExecute: obj => obj is Person // Кнопка активна тільки якщо вибрано людину
+            );
             // Заглушки (виводять повідомлення, поки вікна не створені)
             OpenSearchCommand = new RelayCommand(obj => MessageBox.Show("Вікно пошуку розробляється"));
             OpenFilterPlaceCommand = new RelayCommand(obj => MessageBox.Show("Фільтрація розробляється"));
@@ -49,8 +59,22 @@ namespace MyGrampsApp.ViewModels
             LoadPeopleData();
         }
 
-        // Методи відкриття вікон
+        private void ExecuteDeletePerson(Person person)
+        {
+            if (person == null) return;
 
+            var result = MessageBox.Show($"Ви впевнені, що хочете видалити {person.FirstName} {person.LastName}?",
+                                         "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (_dbService.DeletePerson(person.Id))
+                {
+                    MessageBox.Show("Особу видалено");
+                    LoadPeopleData(); // Оновлюємо список
+                }
+            }
+        }
         private void OpenBuildTree()
         {
             FamilyTreeWindow treeWin = new FamilyTreeWindow();
@@ -221,4 +245,5 @@ namespace MyGrampsApp.ViewModels
             protected void OnPropertyChanged(string name) =>
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
 }

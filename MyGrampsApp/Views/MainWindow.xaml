@@ -67,11 +67,17 @@
         Command="{Binding RefreshCommand}"
         Style="{StaticResource RefreshButtonStyle}"
         VerticalAlignment="Center"/>
+            <Button x:Name="btnDelete" 
+        Content="🗑 Видалити" 
+        Command="{Binding DeletePersonCommand}"
+        CommandParameter="{Binding SelectedItem, ElementName=dgPeople}"
+        VerticalAlignment="Center"/>
         </Menu>
 
         <Grid Margin="10">
             <DataGrid x:Name="dgPeople" 
           ItemsSource="{Binding People}" 
+          SelectedItem="{Binding SelectedPerson}"            
           AutoGenerateColumns="False" 
           IsReadOnly="True" 
           Background="White"
