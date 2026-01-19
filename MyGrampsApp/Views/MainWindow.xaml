@@ -72,6 +72,10 @@
         Command="{Binding DeletePersonCommand}"
         CommandParameter="{Binding SelectedItem, ElementName=dgPeople}"
         VerticalAlignment="Center"/>
+            <Button Content="✏ Редагувати" 
+        Command="{Binding EditPersonCommand}" 
+        CommandParameter="{Binding SelectedPerson}"/>
+            
         </Menu>
 
         <Grid Margin="10">

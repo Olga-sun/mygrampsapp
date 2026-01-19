@@ -12,7 +12,6 @@ namespace MyGrampsApp.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         private readonly DatabaseService _dbService = new DatabaseService();
-
         public ObservableCollection<Person> People { get; set; } = new ObservableCollection<Person>();
 
         private Person _selectedPerson;
@@ -21,44 +20,62 @@ namespace MyGrampsApp.ViewModels
             get => _selectedPerson;
             set { _selectedPerson = value; OnPropertyChanged(nameof(SelectedPerson)); }
         }
-        // Команди для вікон введення
+        // Команди
         public ICommand RefreshCommand { get; }
         public ICommand OpenKinshipCommand { get; }
         public ICommand OpenAddPersonCommand { get; }
         public ICommand OpenAddDocumentCommand { get; }
+        public ICommand EditPersonCommand { get; }
+        public ICommand DeletePersonCommand { get; }
+        public ICommand DeleteKinshipCommand { get; }
 
+        // Команди-заглушки
         public ICommand OpenSearchCommand { get; }
         public ICommand OpenFilterPlaceCommand { get; }
         public ICommand OpenShowDocsCommand { get; }
         public ICommand OpenBuildTreeCommand { get; }
         public ICommand OpenStatsCommand { get; }
         public ICommand OpenBioCommand { get; }
-        public ICommand DeletePersonCommand { get; }
 
         public MainViewModel()
         {
-            // Ініціалізація існуючих команд
             RefreshCommand = new RelayCommand(obj => LoadPeopleData());
             OpenKinshipCommand = new RelayCommand(obj => OpenKinshipWindow());
             OpenAddPersonCommand = new RelayCommand(obj => OpenAddPersonWindow());
             OpenBuildTreeCommand = new RelayCommand(obj => OpenBuildTree());
-            // Ініціалізація нових команд та заглушок
             OpenAddDocumentCommand = new RelayCommand(obj => OpenAddDocumentWindow());
+
+            // Ініціалізація команди редагування (активна, коли вибрано особу)
+            EditPersonCommand = new RelayCommand(obj => OpenEditPersonWindow(), obj => SelectedPerson != null);
+
             DeletePersonCommand = new RelayCommand(
                 execute: obj => ExecuteDeletePerson(obj as Person),
-                canExecute: obj => obj is Person // Кнопка активна тільки якщо вибрано людину
+                canExecute: obj => obj is Person
             );
-            // Заглушки (виводять повідомлення, поки вікна не створені)
+
+            // Заглушки
             OpenSearchCommand = new RelayCommand(obj => MessageBox.Show("Вікно пошуку розробляється"));
             OpenFilterPlaceCommand = new RelayCommand(obj => MessageBox.Show("Фільтрація розробляється"));
             OpenShowDocsCommand = new RelayCommand(obj => MessageBox.Show("Список документів розробляється"));
-            
             OpenStatsCommand = new RelayCommand(obj => MessageBox.Show("Статистика розробляється"));
             OpenBioCommand = new RelayCommand(obj => MessageBox.Show("Біографія розробляється"));
 
             LoadPeopleData();
         }
+        private void OpenEditPersonWindow()
+        {
+            if (SelectedPerson == null) return;
 
+            var win = new AddPersonWindow();
+            var vm = new AddPersonViewModel();
+            vm.SetPersonForEdit(SelectedPerson);
+            win.DataContext = vm;
+
+            if (win.ShowDialog() == true)
+            {
+                LoadPeopleData();
+            }
+        }
         private void ExecuteDeletePerson(Person person)
         {
             if (person == null) return;
@@ -144,62 +161,84 @@ namespace MyGrampsApp.ViewModels
             }
         }
 
-        // --- VIEWMODEL ДЛЯ ВІКНА ЗВ'ЯЗКІВ ---
-        public class KinshipViewModel : INotifyPropertyChanged
+    // --- VIEWMODEL ДЛЯ ВІКНА ЗВ'ЯЗКІВ ---
+    public class KinshipViewModel : INotifyPropertyChanged
+    {
+        private readonly DatabaseService _dbService = new DatabaseService();
+        public ObservableCollection<Person> People { get; set; }
+
+        private Person _selectedParent;
+        public Person SelectedParent
         {
-            private readonly DatabaseService _dbService = new DatabaseService();
-            public ObservableCollection<Person> People { get; set; }
-
-            private Person _selectedParent;
-            public Person SelectedParent
-            {
-                get => _selectedParent;
-                set { _selectedParent = value; OnPropertyChanged(nameof(SelectedParent)); }
-            }
-
-            private Person _selectedChild;
-            public Person SelectedChild
-            {
-                get => _selectedChild;
-                set { _selectedChild = value; OnPropertyChanged(nameof(SelectedChild)); }
-            }
-
-            public string SelectedRelationType { get; set; } = "parent-child";
-            public ICommand SaveKinshipCommand { get; }
-
-            public KinshipViewModel(IEnumerable<Person> currentPeople)
-            {
-                People = new ObservableCollection<Person>(currentPeople);
-
-                SaveKinshipCommand = new RelayCommand(obj =>
-                {
-                    // Перевірки перед відправкою
-                    if (SelectedParent == null || SelectedChild == null)
-                    {
-                        MessageBox.Show("Виберіть обох осіб!");
-                        return;
-                    }
-
-                    if (SelectedParent.Id == SelectedChild.Id)
-                    {
-                        MessageBox.Show("Особа не може бути родичем самій собі!");
-                        return;
-                    }
-
-                    // Один виклик сервісу. 
-                    // Результат true означає успіх. 
-                    // Результат false означає, що DatabaseService вже показав текст помилки з БД.
-                    if (_dbService.AddKinship(SelectedParent.Id, SelectedChild.Id, SelectedRelationType))
-                    {
-                        MessageBox.Show("Зв'язок успішно додано до бази!");
-                    }
-                });
-            }
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected void OnPropertyChanged(string name) =>
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            get => _selectedParent;
+            set { _selectedParent = value; OnPropertyChanged(nameof(SelectedParent)); }
         }
-        public class AddPersonViewModel : INotifyPropertyChanged
+
+        private Person _selectedChild;
+        public Person SelectedChild
+        {
+            get => _selectedChild;
+            set { _selectedChild = value; OnPropertyChanged(nameof(SelectedChild)); }
+        }
+
+        public string SelectedRelationType { get; set; } = "parent-child";
+
+        public ICommand SaveKinshipCommand { get; }
+        public ICommand DeleteKinshipCommand { get; } // Додано властивість для видалення
+
+        // КОНСТРУКТОР
+        public KinshipViewModel(IEnumerable<Person> currentPeople)
+        {
+            People = new ObservableCollection<Person>(currentPeople);
+
+            // Ініціалізація команди збереження
+            SaveKinshipCommand = new RelayCommand(obj =>
+            {
+                if (SelectedParent == null || SelectedChild == null)
+                {
+                    MessageBox.Show("Виберіть обох осіб!");
+                    return;
+                }
+
+                if (SelectedParent.Id == SelectedChild.Id)
+                {
+                    MessageBox.Show("Особа не може бути родичем самій собі!");
+                    return;
+                }
+
+                if (_dbService.AddKinship(SelectedParent.Id, SelectedChild.Id, SelectedRelationType))
+                {
+                    MessageBox.Show("Зв'язок успішно додано до бази!");
+                }
+            });
+
+            // Ініціалізація команди видалення (НОВЕ)
+            DeleteKinshipCommand = new RelayCommand(obj =>
+            {
+                if (SelectedParent == null || SelectedChild == null)
+                {
+                    MessageBox.Show("Виберіть обох осіб, щоб розірвати зв'язок між ними!");
+                    return;
+                }
+
+                var result = MessageBox.Show($"Ви впевнені, що хочете видалити зв'язок між {SelectedParent.FirstName} та {SelectedChild.FirstName}?",
+                                             "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (_dbService.DeleteKinship(SelectedParent.Id, SelectedChild.Id))
+                    {
+                        MessageBox.Show("Зв'язок успішно видалено!");
+                    }
+                }
+            });
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+    public class AddPersonViewModel : INotifyPropertyChanged
         {
             private readonly DatabaseService _dbService = new DatabaseService();
 
@@ -211,39 +250,58 @@ namespace MyGrampsApp.ViewModels
 
             public ICommand SaveCommand { get; }
 
-            public AddPersonViewModel()
-            {
-                // Завантажуємо місця при ініціалізації ViewModel
-                LoadPlaces();
+        public AddPersonViewModel()
+        {
+            LoadPlaces();
 
-                SaveCommand = new RelayCommand(obj =>
+            SaveCommand = new RelayCommand(obj =>
+            {
+                if (string.IsNullOrWhiteSpace(NewPerson.FirstName) || string.IsNullOrWhiteSpace(NewPerson.LastName))
                 {
-                    if (string.IsNullOrWhiteSpace(NewPerson.FirstName) || string.IsNullOrWhiteSpace(NewPerson.LastName))
+                    MessageBox.Show("Будь ласка, заповніть ім'я та прізвище.");
+                    return;
+                }
+
+                NewPerson.UserId = App.CurrentUserId;
+
+                bool success;
+                if (NewPerson.Id > 0)
+                    success = _dbService.UpdatePerson(NewPerson);
+                else
+                    success = _dbService.AddPerson(NewPerson);
+
+                if (success)
+                {
+                    MessageBox.Show("Дані успішно збережено!");
+                    if (obj is Window window)
                     {
-                        MessageBox.Show("Будь ласка, заповніть ім'я та прізвище.");
-                        return;
+                        window.DialogResult = true;
+                        window.Close();
                     }
+                }
+            });
+        }
 
-                    NewPerson.UserId = App.CurrentUserId;
-
-                    if (_dbService.AddPerson(NewPerson))
-                    {
-                        MessageBox.Show("Особу успішно зареєстровано!");
-                        if (obj is Window window) window.Close();
-                    }
-                });
-            }
-
-            private void LoadPlaces()
+        public void SetPersonForEdit(Person person)
+        {
+            NewPerson = new Person
             {
-            Places = _dbService.GetPlaces();
-
-            OnPropertyChanged(nameof(Places));
+                Id = person.Id,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Patronymic = person.Patronymic,
+                Sex = person.Sex,
+                BirthDate = person.BirthDate,
+                DeathDate = person.DeathDate,
+                Notes = person.Notes,
+                BirthPlaceId = person.BirthPlaceId
+            };
+            OnPropertyChanged(nameof(NewPerson));
         }
 
-            public event PropertyChangedEventHandler PropertyChanged;
-            protected void OnPropertyChanged(string name) =>
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        private void LoadPlaces() { /* код завантаження */ }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
 }

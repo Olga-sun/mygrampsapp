@@ -166,6 +166,47 @@ namespace MyGrampsApp.Services
                 }
             }
         }
+        // Оновлення даних особи
+        public bool UpdatePerson(Person person)
+        {
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                conn.Open();
+                string sql = @"UPDATE person SET first_name=@fn, last_name=@ln, sex=@sex, 
+                       birth_date=@bd, death_date=@dd, notes=@notes 
+                       WHERE id=@id AND user_id=@uid";
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@fn", person.FirstName);
+                    cmd.Parameters.AddWithValue("@ln", person.LastName);
+                    cmd.Parameters.AddWithValue("@sex", person.Sex);
+                    cmd.Parameters.AddWithValue("@bd", person.BirthDate);
+                    cmd.Parameters.AddWithValue("@dd", (object)person.DeathDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@notes", (object)person.Notes ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@id", person.Id);
+                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        // Видалення родинного зв'язку
+        public bool DeleteKinship(int parentId, int childId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                conn.Open();
+                string sql = "DELETE FROM kinship WHERE parent_id=@pid AND child_id=@cid AND user_id=@uid";
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@pid", parentId);
+                    cmd.Parameters.AddWithValue("@cid", childId);
+                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
     }
 }
 

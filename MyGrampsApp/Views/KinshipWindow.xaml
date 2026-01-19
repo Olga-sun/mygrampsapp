@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Встановлення родинних зв'язків" Height="450" Width="450">
+        Title="Встановлення та розірвання родинних зв'язків" Height="500" Width="450">
 
     <StackPanel Margin="20">
         <TextBlock Text="Хто (Батько/Родич):" FontWeight="SemiBold"/>
@@ -54,6 +54,21 @@
                 Command="{Binding SaveKinshipCommand}" 
                 Height="45" 
                 Background="LightGreen"
+                FontWeight="Bold"
+                Cursor="Hand"
+                Margin="0,0,0,10">
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+
+        <Button Content="💔 Розірвати зв'язок" 
+                Command="{Binding DeleteKinshipCommand}" 
+                Height="45" 
+                Background="#FFEBEE"
+                Foreground="#D32F2F"
                 FontWeight="Bold"
                 Cursor="Hand">
             <Button.Resources>
