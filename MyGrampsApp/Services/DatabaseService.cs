@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using MyGrampsApp.Models;
-using System.Collections.Generic;
 using System.Data;
 using System.Windows;
 
@@ -8,7 +7,7 @@ namespace MyGrampsApp.Services
 {
     public class DatabaseService
     {
-        // Тимчасово залишаємо тут, але пізніше винесемо в конфіг
+       
         private readonly string _connString = "Server=localhost;Database=new_database;User Id=sa;Password=2026777;TrustServerCertificate=True;";
 
         public List<Person> GetAllPeople(int userId)
@@ -65,14 +64,14 @@ namespace MyGrampsApp.Services
                         cmd.Parameters.AddWithValue("@type", relationType);
                         cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
 
-                        // Виконуємо запит. Якщо тригер викине RAISERROR, ми перейдемо в блок catch.
+                        
                         cmd.ExecuteNonQuery();
                         return true;
                     }
                 }
                 catch (SqlException ex)
                 {
-                    // Виводимо повідомлення про дублікат або іншу помилку БД
+                  
                     MessageBox.Show(ex.Message);
                     return false;
                 }
@@ -90,7 +89,7 @@ namespace MyGrampsApp.Services
                 try
                 {
                     conn.Open();
-                    // Запит включає всі 10 колонок з вашої структури (крім id)
+                    
                     string sql = @"INSERT INTO person (sex, birth_date, death_date, birth_place_id, notes, last_name, first_name, patronymic, maiden_name, user_id) 
                            VALUES (@sex, @bd, @dd, @bpid, @notes, @ln, @fn, @pat, @mn, @uid)";
 
@@ -133,7 +132,7 @@ namespace MyGrampsApp.Services
                 catch (Exception ex)
                 {
                     MessageBox.Show("Помилка завантаження місць: " + ex.Message);
-                    return new DataTable(); // Повертаємо порожню таблицю, щоб уникнути NullReference
+                    return new DataTable(); 
                 }
             }
         }
@@ -154,19 +153,18 @@ namespace MyGrampsApp.Services
             using (SqlConnection conn = new SqlConnection(_connString))
             {
                 conn.Open();
-                // Важливо: видаляємо тільки якщо id особи та id користувача збігаються
+                
                 string sql = "DELETE FROM person WHERE id = @pid AND user_id = @uid";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@pid", personId);
-                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId); // ID поточної сесії
+                    cmd.Parameters.AddWithValue("@uid", App.CurrentUserId); 
 
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
-        // Оновлення даних особи
         public bool UpdatePerson(Person person)
         {
             using (SqlConnection conn = new SqlConnection(_connString))
@@ -190,7 +188,6 @@ namespace MyGrampsApp.Services
             }
         }
 
-        // Видалення родинного зв'язку
         public bool DeleteKinship(int parentId, int childId)
         {
             using (SqlConnection conn = new SqlConnection(_connString))
