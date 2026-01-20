@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using MyGrampsApp.Models;
+using Mysqlx.Crud;
 using System.Data;
 using System.Windows;
 
@@ -47,6 +48,43 @@ namespace MyGrampsApp.Services
             return people;
         }
 
+        public List<Person> SearchPeopleByLastName(string lastName, int userId)
+        {
+            var people = new List<Person>();
+            using (SqlConnection conn = new SqlConnection(_connString))
+            {
+                conn.Open();
+                // Використовуємо LIKE для пошуку за частиною прізвища
+                string sql = @"SELECT p.id, p.first_name, p.last_name, p.sex, 
+                              CONVERT(VARCHAR, p.birth_date, 104) AS birth_date, 
+                              CONVERT(VARCHAR, p.death_date, 104) AS death_date
+                       FROM person p 
+                       WHERE p.user_id = @uid AND p.last_name LIKE @ln";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@uid", userId);
+                    cmd.Parameters.AddWithValue("@ln", "%" + lastName + "%");
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            people.Add(new Person
+                            {
+                                Id = (int)reader["id"],
+                                FirstName = reader["first_name"].ToString(),
+                                LastName = reader["last_name"].ToString(),
+                                Sex = reader["sex"].ToString(),
+                                BirthDate = reader["birth_date"].ToString(),
+                                DeathDate = reader["death_date"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return people;
+        }
         public bool AddKinship(int parentId, int childId, string relationType)
         {
             using (SqlConnection conn = new SqlConnection(_connString))
@@ -206,7 +244,4 @@ namespace MyGrampsApp.Services
 
     }
 }
-
-
-
 

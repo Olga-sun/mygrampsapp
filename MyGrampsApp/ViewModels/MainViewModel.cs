@@ -53,8 +53,9 @@ namespace MyGrampsApp.ViewModels
                 canExecute: obj => obj is Person
             );
 
+            OpenSearchCommand = new RelayCommand(obj => ExecuteSearchByLastName());
+
             // Заглушки
-            OpenSearchCommand = new RelayCommand(obj => MessageBox.Show("Вікно пошуку розробляється"));
             OpenFilterPlaceCommand = new RelayCommand(obj => MessageBox.Show("Фільтрація розробляється"));
             OpenShowDocsCommand = new RelayCommand(obj => MessageBox.Show("Список документів розробляється"));
             OpenStatsCommand = new RelayCommand(obj => MessageBox.Show("Статистика розробляється"));
@@ -139,7 +140,39 @@ namespace MyGrampsApp.ViewModels
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         // Проста реалізація RelayCommand всередині того ж файлу (або винесіть у папку Services/Commands)
-        
+        private void ExecuteSearchByLastName()
+        {
+            // Використовуємо InputBox для швидкої реалізації введення прізвища
+            // Потребує додавання посилання на Microsoft.VisualBasic у проекті або створення свого діалогу
+            string searchLastName = Microsoft.VisualBasic.Interaction.InputBox(
+                "Введіть прізвище для пошуку:",
+                "Пошук осіб",
+                "");
+
+            if (!string.IsNullOrWhiteSpace(searchLastName))
+            {
+                try
+                {
+                    var results = _dbService.SearchPeopleByLastName(searchLastName, App.CurrentUserId);
+
+                    People.Clear();
+                    foreach (var person in results)
+                    {
+                        People.Add(person);
+                    }
+
+                    if (results.Count == 0)
+                    {
+                        MessageBox.Show("Осіб за таким прізвищем не знайдено.");
+                        LoadPeopleData(); // Повертаємо повний список, якщо нічого не знайдено
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show("Помилка пошуку: " + ex.Message);
+                }
+            }
+        }
     }
     public class RelayCommand : ICommand
         {
