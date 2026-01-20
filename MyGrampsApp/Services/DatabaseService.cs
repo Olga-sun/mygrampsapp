@@ -8,8 +8,8 @@ namespace MyGrampsApp.Services
 {
     public class DatabaseService
     {
-       
-        private readonly string _connString = "Server=localhost;Database=new_database;User Id=sa;Password=2026777;TrustServerCertificate=True;";
+
+        private readonly string _connString = "Server=localhost;Database=new_database;User Id=UserTreeApp;Password=StrongPassword2026;TrustServerCertificate=True;";
 
         public List<Person> GetAllPeople(int userId)
         {
