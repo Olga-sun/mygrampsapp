@@ -277,9 +277,16 @@ namespace MyGrampsApp.ViewModels
 
             // Об'єкт для нової особи
             public Person NewPerson { get; set; } = new Person();
+             private string _newBirthPlaceName;
+        public string NewBirthPlaceName
+        {
+            get => _newBirthPlaceName;
+            set { _newBirthPlaceName = value; OnPropertyChanged(nameof(NewBirthPlaceName)); }
+        }
+         
 
-            // Список місць для ComboBox
-            public DataTable Places { get; set; }
+        // Список місць для ComboBox
+        public DataTable Places { get; set; }
 
             public ICommand SaveCommand { get; }
 
@@ -299,9 +306,9 @@ namespace MyGrampsApp.ViewModels
 
                 bool success;
                 if (NewPerson.Id > 0)
-                    success = _dbService.UpdatePerson(NewPerson);
+                    success = _dbService.UpdatePerson(NewPerson, NewBirthPlaceName); 
                 else
-                    success = _dbService.AddPerson(NewPerson);
+                    success = _dbService.AddPerson(NewPerson, NewBirthPlaceName);
 
                 if (success)
                 {
@@ -332,7 +339,10 @@ namespace MyGrampsApp.ViewModels
             OnPropertyChanged(nameof(NewPerson));
         }
 
-        private void LoadPlaces() { /* код завантаження */ }
+        private void LoadPlaces() {
+            Places = _dbService.GetPlaces();
+            OnPropertyChanged(nameof(Places));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

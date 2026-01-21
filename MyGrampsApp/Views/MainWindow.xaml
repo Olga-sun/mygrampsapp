@@ -93,6 +93,7 @@
                     <DataGridTextColumn Header="По батькові" Binding="{Binding Patronymic}" Width="*"/>
                     <DataGridTextColumn Header="Стать" Binding="{Binding Sex}" Width="80"/>
                     <DataGridTextColumn Header="Дата народження" Binding="{Binding BirthDate}" Width="120"/>
+                    <DataGridTextColumn Header="Місце народження" Binding="{Binding BirthPlaceName}" Width="*"/>
                     <DataGridTextColumn Header="Дата смерті" Binding="{Binding DeathDate}" Width="120"/>
                 </DataGrid.Columns>
             </DataGrid>

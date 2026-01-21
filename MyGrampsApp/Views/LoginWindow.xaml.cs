@@ -15,14 +15,14 @@ namespace MyGrampsApp.Views
 {
     public partial class LoginWindow : Window
     {
-        string connString = "Server=localhost;Database=new_database;User Id=sa;Password=2026777;TrustServerCertificate=True;";
+        string connString = "Server=localhost;Database=new_database;Integrated Security=True;TrustServerCertificate=True;";
 
         public LoginWindow()
         {
             InitializeComponent();
         }
 
-        // МЕТОД ДЛЯ ХЕШУВАННЯ 
+        
         private string ComputeHash(string password)
         {
             using (SHA256 sha256 = SHA256.Create())
