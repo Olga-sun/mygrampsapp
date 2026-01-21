@@ -11,8 +11,8 @@ namespace MyGrampsApp.Models
         public string LastName { get; set; } = string.Empty;
         public string Patronymic { get; set; } = string.Empty;
         public string Sex { get; set; } = string.Empty;
-        public string BirthDate { get; set; } = string.Empty;
-        public string? DeathDate { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public DateTime? DeathDate { get; set; }
         public string? Notes { get; set; }
         public int UserId { get; set; }
         public int? BirthPlaceId { get; set; }

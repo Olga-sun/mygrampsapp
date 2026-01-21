@@ -92,9 +92,13 @@
                     <DataGridTextColumn Header="Прізвище" Binding="{Binding LastName}" Width="*"/>
                     <DataGridTextColumn Header="По батькові" Binding="{Binding Patronymic}" Width="*"/>
                     <DataGridTextColumn Header="Стать" Binding="{Binding Sex}" Width="80"/>
-                    <DataGridTextColumn Header="Дата народження" Binding="{Binding BirthDate}" Width="120"/>
+                    <DataGridTextColumn Header="Дата народження" 
+                    Binding="{Binding BirthDate, StringFormat='dd.MM.yyyy'}" />
+
+                    <DataGridTextColumn Header="Дата смерті" 
+                    Binding="{Binding DeathDate, StringFormat='dd.MM.yyyy'}" />
                     <DataGridTextColumn Header="Місце народження" Binding="{Binding BirthPlaceName}" Width="*"/>
-                    <DataGridTextColumn Header="Дата смерті" Binding="{Binding DeathDate}" Width="120"/>
+                    
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

@@ -37,8 +37,8 @@ namespace MyGrampsApp.Views
                     FirstName = p.FirstName,
                     LastName = p.LastName,
                     Patronymic = p.Patronymic,
-                    BirthDate = p.BirthDate
-                   
+                    BirthDate = p.BirthDate?.ToString("dd.MM.yyyy")
+
                 });
 
                 var childrenIds = new HashSet<int>();

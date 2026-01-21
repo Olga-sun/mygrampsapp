@@ -61,10 +61,12 @@
             </StackPanel>
         </Grid>
         <TextBlock Text="Місце народження:"/>
-        <ComboBox ItemsSource="{Binding Places}" 
+         <ComboBox ItemsSource="{Binding Places}" 
           DisplayMemberPath="name" 
           SelectedValuePath="id" 
           SelectedValue="{Binding NewPerson.BirthPlaceId}" 
+          IsEditable="True" 
+          Text="{Binding NewBirthPlaceName, UpdateSourceTrigger=PropertyChanged}"
           Margin="0,0,0,10"/>
         <TextBlock Text="Нотатки:"/>
         <TextBox Text="{Binding NewPerson.Notes}" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,15"/>
