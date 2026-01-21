@@ -19,7 +19,7 @@ namespace MyGrampsApp.Services
             {
                 conn.Open();
                 string sql = @"
-                    SELECT p.id, p.first_name, p.last_name, p.sex, 
+                    SELECT p.id, p.first_name, p.last_name, p.patronymic, p.sex, 
                            CONVERT(VARCHAR, p.birth_date, 104) AS birth_date, 
                            CONVERT(VARCHAR, p.death_date, 104) AS death_date
                     FROM person p
@@ -37,6 +37,7 @@ namespace MyGrampsApp.Services
                                 Id = (int)reader["id"],
                                 FirstName = reader["first_name"].ToString(),
                                 LastName = reader["last_name"].ToString(),
+                                Patronymic = reader["patronymic"].ToString(),
                                 Sex = reader["sex"].ToString(),
                                 BirthDate = reader["birth_date"].ToString(),
                                 DeathDate = reader["death_date"].ToString()
@@ -55,7 +56,7 @@ namespace MyGrampsApp.Services
             {
                 conn.Open();
                 // Використовуємо LIKE для пошуку за частиною прізвища
-                string sql = @"SELECT p.id, p.first_name, p.last_name, p.sex, 
+                string sql = @"SELECT p.id, p.first_name, p.last_name, p.patronymic, p.sex, 
                               CONVERT(VARCHAR, p.birth_date, 104) AS birth_date, 
                               CONVERT(VARCHAR, p.death_date, 104) AS death_date
                        FROM person p 
@@ -75,6 +76,7 @@ namespace MyGrampsApp.Services
                                 Id = (int)reader["id"],
                                 FirstName = reader["first_name"].ToString(),
                                 LastName = reader["last_name"].ToString(),
+                                Patronymic = reader["patronymic"].ToString(),
                                 Sex = reader["sex"].ToString(),
                                 BirthDate = reader["birth_date"].ToString(),
                                 DeathDate = reader["death_date"].ToString()
@@ -127,15 +129,17 @@ namespace MyGrampsApp.Services
                 try
                 {
                     conn.Open();
-                    
-                    string sql = @"INSERT INTO person (sex, birth_date, death_date, birth_place_id, notes, last_name, first_name, patronymic, maiden_name, user_id) 
-                           VALUES (@sex, @bd, @dd, @bpid, @notes, @ln, @fn, @pat, @mn, @uid)";
 
+                    string sql = @"INSERT INTO person (sex, birth_date, death_date, notes, last_name, first_name, patronymic, maiden_name, user_id) 
+                           VALUES (@sex, @bd, @dd, @notes, @ln, @fn, @pat, @mn, @uid)";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@sex", person.Sex);
-                        cmd.Parameters.AddWithValue("@bd", person.BirthDate);
-                        cmd.Parameters.AddWithValue("@dd", (object)person.DeathDate ?? DBNull.Value);
+                        cmd.Parameters.Add("@bd", SqlDbType.Date).Value =
+                    DateTime.ParseExact(person.BirthDate, "dd.MM.yyyy", null);
+
+                        cmd.Parameters.Add("@dd", SqlDbType.Date).Value =
+                            string.IsNullOrEmpty(person.DeathDate) ? DBNull.Value : DateTime.ParseExact(person.DeathDate, "dd.MM.yyyy", null);
                         cmd.Parameters.AddWithValue("@bpid", (object)person.BirthPlaceId ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@notes", (object)person.Notes ?? DBNull.Value);
                         cmd.Parameters.AddWithValue("@ln", person.LastName);
@@ -208,16 +212,19 @@ namespace MyGrampsApp.Services
             using (SqlConnection conn = new SqlConnection(_connString))
             {
                 conn.Open();
-                string sql = @"UPDATE person SET first_name=@fn, last_name=@ln, sex=@sex, 
+                string sql = @"UPDATE person SET first_name=@fn, last_name=@ln, patronymic=@pat, sex=@sex, 
                        birth_date=@bd, death_date=@dd, notes=@notes 
                        WHERE id=@id AND user_id=@uid";
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@fn", person.FirstName);
                     cmd.Parameters.AddWithValue("@ln", person.LastName);
+                    cmd.Parameters.AddWithValue("@pat", person.Patronymic ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@sex", person.Sex);
-                    cmd.Parameters.AddWithValue("@bd", person.BirthDate);
-                    cmd.Parameters.AddWithValue("@dd", (object)person.DeathDate ?? DBNull.Value);
+                    cmd.Parameters.Add("@bd", SqlDbType.Date).Value =
+                DateTime.ParseExact(person.BirthDate, "dd.MM.yyyy", null);
+                    cmd.Parameters.Add("@dd", SqlDbType.Date).Value =
+                string.IsNullOrEmpty(person.DeathDate) ? DBNull.Value : DateTime.ParseExact(person.DeathDate, "dd.MM.yyyy", null);
                     cmd.Parameters.AddWithValue("@notes", (object)person.Notes ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@id", person.Id);
                     cmd.Parameters.AddWithValue("@uid", App.CurrentUserId);
