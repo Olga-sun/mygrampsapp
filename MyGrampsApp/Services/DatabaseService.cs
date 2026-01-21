@@ -136,7 +136,7 @@ namespace MyGrampsApp.Services
                 try
                 {
                     conn.Open();
-                    // 1. Перевіряємо, чи вже існує місто з такою назвою
+                    //  Перевіряємо, чи вже існує місто з такою назвою
                     string checkSql = "SELECT id FROM place WHERE name = @name";
                     using (SqlCommand cmd = new SqlCommand(checkSql, conn))
                     {
