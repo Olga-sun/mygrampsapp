@@ -18,6 +18,8 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding LastName}" Margin="0,0,5,0" FontWeight="Bold"/>
                         <TextBlock Text="{Binding FirstName}"/>
+                        <TextBlock Text="{Binding Patronymic}" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding BirthDate, StringFormat='({0})'}" Foreground="Gray" FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
@@ -34,6 +36,8 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding LastName}" Margin="0,0,5,0" FontWeight="Bold"/>
                         <TextBlock Text="{Binding FirstName}"/>
+                        <TextBlock Text="{Binding Patronymic}" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding BirthDate, StringFormat='({0})'}" Foreground="Gray" FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>

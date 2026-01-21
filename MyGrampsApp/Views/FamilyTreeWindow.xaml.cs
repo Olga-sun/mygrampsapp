@@ -23,19 +23,22 @@ namespace MyGrampsApp.Views
         {
             try
             {
-                int userId = App.CurrentUserId; // Наш користувач №5
+                int userId = App.CurrentUserId; 
 
-                // 1. Отримуємо людей та зв'язки
                 var people = _dbService.GetAllPeople(userId);
                 DataTable links = _dbService.GetFamilyLinks(userId);
 
                 if (people == null || people.Count == 0) return;
 
-                // 2. Створюємо словник нод (FamilyMemberNode)
+            
                 var nodes = people.ToDictionary(p => p.Id, p => new FamilyMemberNode
                 {
                     Id = p.Id,
-                    FullName = $"{p.FirstName} {p.LastName}"
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    Patronymic = p.Patronymic,
+                    BirthDate = p.BirthDate
+                   
                 });
 
                 var childrenIds = new HashSet<int>();

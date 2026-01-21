@@ -17,8 +17,8 @@ namespace MyGrampsApp.Models
         public int UserId { get; set; }
         public int? BirthPlaceId { get; set; }
         public string BirthPlaceName { get; set; }
-        public string? MaidenName { get; set; } 
-        public string FullName => $"{LastName} {FirstName} {Patronymic}".Trim();
+        public string? MaidenName { get; set; }
+        public string FullName => $"{LastName} {FirstName} {Patronymic} ({BirthDate})".Trim();
         public override string ToString() => FullName;
     }
 }
