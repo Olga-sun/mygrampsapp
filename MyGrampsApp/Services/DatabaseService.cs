@@ -128,7 +128,7 @@ namespace MyGrampsApp.Services
         
         public int? EnsurePlaceExists(string placeName)
         {
-            // Якщо поле порожнє, повертаємо null (місце не вказано)
+            
             if (string.IsNullOrWhiteSpace(placeName)) return null;
 
             using (SqlConnection conn = new SqlConnection(_connString))
@@ -149,7 +149,7 @@ namespace MyGrampsApp.Services
                             return Convert.ToInt32(result);
                         }
 
-                        // 2. Якщо такого міста немає — створюємо новий запис
+                        // Якщо такого міста немає — створюємо новий запис
                         // OUTPUT INSERTED.id дозволяє одразу отримати ID нового рядка
                         string insertSql = "INSERT INTO place (name) OUTPUT INSERTED.id VALUES (@name)";
                         using (SqlCommand insCmd = new SqlCommand(insertSql, conn))
