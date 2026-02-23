@@ -50,5 +50,23 @@ namespace MyGrampsApp.Models
                 return age.ToString();
             }
         }
+        public bool IsLifeCycleValid(out string errorMessage)
+        {
+            errorMessage = string.Empty;
+
+            if (BirthDate.HasValue && BirthDate.Value > DateTime.Today)
+            {
+                errorMessage = "Дата народження не може бути в майбутньому.";
+                return false;
+            }
+
+            if (BirthDate.HasValue && DeathDate.HasValue && DeathDate.Value < BirthDate.Value)
+            {
+                errorMessage = "Дата смерті не може бути раніше дати народження.";
+                return false;
+            }
+
+            return true;
+        }
     }
 }
