@@ -7,7 +7,10 @@ namespace MyGrampsApp.Models
     public class Person
     {
         public int Id { get; set; }
-        // Додаємо ?, щоб дозволити null для рядків, де це логічно
+        public int? FatherId { get; set; }
+        public int? MotherId { get; set; }
+        public List<Person> Children { get; set; } = new List<Person>();
+
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Patronymic { get; set; }
@@ -20,7 +23,7 @@ namespace MyGrampsApp.Models
         public string? BirthPlaceName { get; set; }
         public string? MaidenName { get; set; }
 
-        // Покращена логіка FullName: перевіряємо дату на null, щоб не було порожніх дужок ()
+        
         public string FullName
         {
             get
@@ -32,7 +35,7 @@ namespace MyGrampsApp.Models
 
         public override string ToString() => FullName;
 
-        // Додатковий метод для розрахунку віку, щоб програма не "падала"
+       
         public string Age
         {
             get
@@ -46,6 +49,24 @@ namespace MyGrampsApp.Models
 
                 return age.ToString();
             }
+        }
+        public bool IsLifeCycleValid(out string errorMessage)
+        {
+            errorMessage = string.Empty;
+
+            if (BirthDate.HasValue && BirthDate.Value > DateTime.Today)
+            {
+                errorMessage = "Дата народження не може бути в майбутньому.";
+                return false;
+            }
+
+            if (BirthDate.HasValue && DeathDate.HasValue && DeathDate.Value < BirthDate.Value)
+            {
+                errorMessage = "Дата смерті не може бути раніше дати народження.";
+                return false;
+            }
+
+            return true;
         }
     }
 }
