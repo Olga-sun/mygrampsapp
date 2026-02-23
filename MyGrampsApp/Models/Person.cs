@@ -7,7 +7,7 @@ namespace MyGrampsApp.Models
     public class Person
     {
         public int Id { get; set; }
-        // Додаємо ?, щоб дозволити null для рядків, де це логічно
+        
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Patronymic { get; set; }
@@ -20,7 +20,7 @@ namespace MyGrampsApp.Models
         public string? BirthPlaceName { get; set; }
         public string? MaidenName { get; set; }
 
-        // Покращена логіка FullName: перевіряємо дату на null, щоб не було порожніх дужок ()
+        
         public string FullName
         {
             get
@@ -32,7 +32,7 @@ namespace MyGrampsApp.Models
 
         public override string ToString() => FullName;
 
-        // Додатковий метод для розрахунку віку, щоб програма не "падала"
+       
         public string Age
         {
             get

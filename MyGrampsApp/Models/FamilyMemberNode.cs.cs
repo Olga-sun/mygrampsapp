@@ -8,16 +8,14 @@ namespace MyGrampsApp.Models
     {
         public int Id { get; set; }
 
-        // Додаємо ?, щоб прибрати CS8612
+        
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Patronymic { get; set; }
 
-        // Оскільки в Person дата — це DateTime?, тут теж краще використовувати DateTime?
-        // або залишити string?, якщо це просто для відображення
         public string? BirthDate { get; set; }
 
-        // Оновлена логіка відображення
+        
         public string FullName
         {
             get
