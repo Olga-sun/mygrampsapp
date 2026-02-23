@@ -7,7 +7,10 @@ namespace MyGrampsApp.Models
     public class Person
     {
         public int Id { get; set; }
-        
+        public int? FatherId { get; set; }
+        public int? MotherId { get; set; }
+        public List<Person> Children { get; set; } = new List<Person>();
+
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Patronymic { get; set; }
