@@ -7,18 +7,45 @@ namespace MyGrampsApp.Models
     public class Person
     {
         public int Id { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string Patronymic { get; set; } = string.Empty;
-        public string Sex { get; set; } = string.Empty;
+        // Додаємо ?, щоб дозволити null для рядків, де це логічно
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Patronymic { get; set; }
+        public string? Sex { get; set; }
         public DateTime? BirthDate { get; set; }
         public DateTime? DeathDate { get; set; }
         public string? Notes { get; set; }
         public int UserId { get; set; }
         public int? BirthPlaceId { get; set; }
-        public string BirthPlaceName { get; set; }
+        public string? BirthPlaceName { get; set; }
         public string? MaidenName { get; set; }
-        public string FullName => $"{LastName} {FirstName} {Patronymic} ({BirthDate})".Trim();
+
+        // Покращена логіка FullName: перевіряємо дату на null, щоб не було порожніх дужок ()
+        public string FullName
+        {
+            get
+            {
+                string datePart = BirthDate.HasValue ? $" ({BirthDate.Value.ToShortDateString()})" : " (Невідомо)";
+                return $"{LastName} {FirstName} {Patronymic}{datePart}".Trim();
+            }
+        }
+
         public override string ToString() => FullName;
+
+        // Додатковий метод для розрахунку віку, щоб програма не "падала"
+        public string Age
+        {
+            get
+            {
+                if (!BirthDate.HasValue) return "—";
+
+                DateTime endDate = DeathDate ?? DateTime.Today;
+                int age = endDate.Year - BirthDate.Value.Year;
+
+                if (BirthDate.Value.Date > endDate.AddYears(-age)) age--;
+
+                return age.ToString();
+            }
+        }
     }
 }
